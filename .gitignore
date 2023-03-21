@@ -1,3 +1,5 @@
 /assets/__pycache__/*
 .idea/
-glyph/
+venv/
+
+.DS_Store/
