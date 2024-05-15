@@ -1,8 +1,5 @@
 import svgwrite
-# import math
-from cairosvg import svg2png
 import random
-# import sys
 
 
 # path editor:  https://yqnn.github.io/svg-path-editor/
@@ -77,15 +74,19 @@ class Petal():
 
 class Glyph():
     def __init__(self, height:int=700, 
-                       width:int=700, 
-                       nb_petals:int=None, 
-                       shape:str=None, 
-                       cm:list=None,
-                       opacity:float=None):
-        shape_list = ['a', 'z', 'r', 'j', 'k', 'b', 's', 'd', 'm']
+                       width:int=700):
+
         self.dwg = svgwrite.Drawing("custom", size=(height, width))
         self.blur_filter = self.dwg.defs.add(self.dwg.filter(x="-40%",width="180%",y="-40%",height="180%"))
         self.blur_filter.feGaussianBlur(in_='SourceGraphic', stdDeviation=2)
+
+    def make_glyph(self,
+                   nb_petals: int = None,
+                   shape: str = None,
+                   cm: list = None,
+                   opacity: float = None
+                   ):
+        shape_list = ['a', 'z', 'r', 'j', 'k', 'b', 's', 'd', 'm']
         if nb_petals==None:
             nb_petals = random.randint(3,12)
         if shape==None:
@@ -96,22 +97,21 @@ class Glyph():
                 cm.append("#%06x" % random.randint(0, 0xFFFFFF))
         if opacity == None:
             opacity=random.uniform(.1, 1)
-        self.nb_petals = nb_petals   
-        self.shape=shape 
-        self.cm=cm
-        self.opacity=opacity
 
-    def make_glyph(self):
         self.g = self.dwg.add(self.dwg.g(id='g', fill='none',style="mix-blend-mode:hard-light"))
         self.g.translate(350,350)
-        for i in range(self.nb_petals):
-            color = Petal(self.dwg, self.shape, self.cm[i%len(self.cm)], self.blur_filter, opacity=self.opacity)
-            color.rotate(i*360/self.nb_petals+random.randint(-4, 4))
-            petal = Petal(self.dwg, self.shape)
-            petal.rotate(i*360/self.nb_petals)
+        for i in range(nb_petals):
+            color = Petal(self.dwg, shape, cm[i%len(cm)], self.blur_filter, opacity=opacity)
+            color.rotate(i*360/nb_petals+random.randint(-4, 4))
+            petal = Petal(self.dwg, shape)
+            petal.rotate(i*360/nb_petals)
             self.g.add(petal.get_svg()) 
             self.g.add(color.get_svg())
-        self.g.scale(2,2)
+        rand_scale = random.uniform(.3, 3)
+
+        self.g.scale(rand_scale,rand_scale)
+
+
 
     def complete(self):
         self.dwg.save() 
